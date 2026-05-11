@@ -1,0 +1,12 @@
+// Grupo: Dani Heart Basso, Eduardo Vieira da Silva, Mariana Alves da Silva
+
+exception InvalidKey {
+	string message;
+};
+
+interface CETcd {
+	readonly attribute string id;
+	boolean put(in string key, in string val);
+	string get (in string key) raises(InvalidKey);
+	void del(in string key) raises(InvalidKey);
+};
