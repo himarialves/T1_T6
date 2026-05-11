@@ -52,15 +52,7 @@ g++ -std=c++11 -I/opt/ACE_wrappers -I/opt/ACE_wrappers/TAO -I/opt/ACE_wrappers/T
     -L/opt/ACE_wrappers/lib -lTAO -lTAO_AnyTypeCode -lTAO_CosNaming -lACE \
     -o cliente_etcd
 ```
-No mac, compilar com:  
-
-```omniidl -bcxx CEtcd.idl
-```
-Após,
-```
- g++ -o servidor servidor.cpp CEtcdI.cpp CEtcdSK.cc \
-  $(pkg-config --cflags --libs omniORB4) 
-  ```
+  
 ## Para rodar:
 
 Rodar **nessa** ordem:
