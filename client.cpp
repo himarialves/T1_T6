@@ -1,29 +1,33 @@
-#include "CEtcdC.h" // stubs do cliente gerados pelo tao_idl
-#include <orbsvcs/CosNamingC.h>
+#include "CEtcdC.h"
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
+// Lê o IOR do arquivo gerado pelo servidor
+#define IOR_FILE "cetcd.ior"
+
 int main(int argc, char* argv[]) {
     try {
-        // Inicializa o ORB (Object Request Broker), ponto de entrada do CORBA
+        // Inicializa o ORB
         CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);
 
-        // Localiza o Servidor de Nomes para descobrir o objeto remoto pelo nome
-        CORBA::Object_var ns_obj = orb->resolve_initial_references("NameService");
-        CosNaming::NamingContext_var nc = CosNaming::NamingContext::_narrow(ns_obj.in());
+        // Lê o IOR do arquivo
+        std::ifstream ior_file(IOR_FILE);
+        if (!ior_file) {
+            std::cerr << "Erro: arquivo " << IOR_FILE << " não encontrado." << std::endl;
+            std::cerr << "Certifique-se de que o servidor está rodando." << std::endl;
+            return 1;
+        }
+        std::string ior;
+        std::getline(ior_file, ior);
+        ior_file.close();
 
-        // Monta o nome com que o servidor publicou o objeto (ver server.cpp)
-        CosNaming::Name name;
-        name.length(1);
-        name[0].id = CORBA::string_dup("ObjetoCEtcd");
-        name[0].kind = CORBA::string_dup("");
-
-        // Resolve o nome para uma referência de objeto e faz narrow para CETcd
-        CORBA::Object_var obj = nc->resolve(name);
+        // Converte a string IOR para referência de objeto e faz narrow para CETcd
+        CORBA::Object_var obj = orb->string_to_object(ior.c_str());
         CETcd_var etcd = CETcd::_narrow(obj.in());
 
         if (CORBA::is_nil(etcd.in())) {
-            std::cerr << "Erro: Nao foi possivel conectar ao objeto CEtcd." << std::endl;
+            std::cerr << "Erro: não foi possível conectar ao objeto CEtcd." << std::endl;
             return 1;
         }
 
